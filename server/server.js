@@ -33,7 +33,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://signalwave-chi.vercel.app/login",
+      "https://signalwave-chi.vercel.app",
     ],
     credentials: true,
   }),

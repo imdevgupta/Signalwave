@@ -1,4 +1,4 @@
-import AuditLog from "../models/Auditlog.js";
+import AuditLog from "../models/AuditLog.js";
 
 export async function writeAuditLog({ user, action, details = {}, ipAddress }) {
   await AuditLog.create({

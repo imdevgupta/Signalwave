@@ -31,9 +31,9 @@ const PORT = process.env.PORT || 4000;
 */
 app.use(
   cors({
-     origin: [
+    origin: [
       "http://localhost:5173",
-      "https://signalwave-seven.vercel.app/",
+      "https://signalwave-chi.vercel.app/login",
     ],
     credentials: true,
   }),

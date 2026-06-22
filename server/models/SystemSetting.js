@@ -22,6 +22,43 @@ const SystemSettingSchema = new mongoose.Schema(
       type: Number,
       default: 60,
     },
+    
+    /*
+|--------------------------------------------------------------------------
+| Monitoring Defaults
+|--------------------------------------------------------------------------
+*/
+
+    failureThreshold: {
+      type: Number,
+      default: 3,
+    },
+
+    diagnosticTimeout: {
+      type: Number,
+      default: 10000,
+    },
+
+    smtpConnectionTimeout: {
+      type: Number,
+      default: 10000,
+    },
+
+    /*
+|--------------------------------------------------------------------------
+| Alert Settings
+|--------------------------------------------------------------------------
+*/
+
+    enableAlerts: {
+      type: Boolean,
+      default: true,
+    },
+
+    autoResolveAlerts: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,

@@ -34,7 +34,7 @@ router.post("/", requireAuth, async (req, res) => {
     const result = await sendTestEmail({
       host: profile.host,
       port: profile.port,
-      secure: profile.secure,
+      securityMode: profile.securityMode,
       username: profile.username,
       password,
       fromAddress: profile.fromAddress,
@@ -47,6 +47,11 @@ router.post("/", requireAuth, async (req, res) => {
       profileName: profile.name,
       host: profile.host,
       port: profile.port,
+      securityMode: profile.secure
+        ? "SSL/TLS"
+        : profile.port === 587
+          ? "STARTTLS"
+          : "Plain SMTP",
       status: "pass",
       testType: "send-test",
       results: result,

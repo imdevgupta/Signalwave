@@ -43,12 +43,14 @@ router.put("/", requireAuth, requireAdmin, async (req, res) => {
     }
 
     settings.appName = req.body.appName;
-
     settings.defaultFrequency = req.body.defaultFrequency;
-
     settings.alertEmail = req.body.alertEmail;
-
     settings.sessionTimeout = req.body.sessionTimeout;
+    settings.failureThreshold = req.body.failureThreshold;
+    settings.diagnosticTimeout = req.body.diagnosticTimeout;
+    settings.smtpConnectionTimeout = req.body.smtpConnectionTimeout;
+    settings.enableAlerts = req.body.enableAlerts;
+    settings.autoResolveAlerts = req.body.autoResolveAlerts;
 
     await settings.save();
 

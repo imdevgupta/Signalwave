@@ -13,6 +13,8 @@ const SmtpTestHistorySchema = new mongoose.Schema(
 
     port: Number,
 
+    securityMode: String,
+    
     status: {
       type: String,
       enum: ["pass", "warn", "fail"],

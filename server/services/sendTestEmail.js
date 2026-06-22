@@ -3,17 +3,49 @@ import nodemailer from "nodemailer";
 export async function sendTestEmail({
   host,
   port,
-  secure,
+  securityMode = "auto",
   username,
   password,
   fromAddress,
   toAddress,
   subject,
 }) {
+  let secure = false;
+
+  let requireTLS = false;
+
+  switch (securityMode) {
+    case "ssl":
+      secure = true;
+      break;
+
+    case "starttls":
+      requireTLS = true;
+      break;
+
+    case "none":
+      break;
+
+    case "auto":
+    default:
+      if (Number(port) === 465) {
+        secure = true;
+      }
+
+      if (Number(port) === 587) {
+        requireTLS = true;
+      }
+
+      break;
+  }
+
   const transporter = nodemailer.createTransport({
     host,
     port,
+
     secure,
+
+    requireTLS,
 
     auth: username
       ? {
@@ -23,7 +55,9 @@ export async function sendTestEmail({
       : undefined,
 
     connectionTimeout: 10000,
+
     greetingTimeout: 10000,
+
     socketTimeout: 15000,
 
     tls: {

@@ -16,10 +16,16 @@ const SmtpProfileSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
+    
     secure: {
       type: Boolean,
       default: false,
+    },
+
+    securityMode: {
+      type: String,
+      enum: ["auto", "ssl", "starttls", "none"],
+      default: "auto",
     },
 
     username: {
@@ -36,7 +42,7 @@ const SmtpProfileSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
-    
+
     monitoringEnabled: {
       type: Boolean,
       default: true,

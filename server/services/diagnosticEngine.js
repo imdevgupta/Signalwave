@@ -187,6 +187,18 @@ export async function runDiagnostics({ host, port }) {
     });
   }
 
+  try {
+    const tlsResult = await startTlsCheck(host, port);
+
+    results.push(tlsResult);
+  } catch (error) {
+    results.push({
+      step: "STARTTLS",
+      status: "fail",
+      error: error.message,
+    });
+  }
+
   return results;
 }
 
@@ -258,6 +270,14 @@ async function ehloCapabilities(host, port) {
 }
 
 async function startTlsCheck(host, port) {
+  if (Number(port) === 465) {
+    return {
+      step: "STARTTLS",
+      status: "pass",
+      message: "Implicit SSL/TLS Port",
+    };
+  }
+  
   return new Promise((resolve, reject) => {
     const socket = net.createConnection({
       host,

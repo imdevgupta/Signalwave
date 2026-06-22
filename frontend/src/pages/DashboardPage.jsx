@@ -51,11 +51,11 @@ export default function DashboardPage() {
         setPassFail([
           {
             name: "Passed",
-            value: passFailData.passed,
+            value: Number(passFailData?.passed || 0),
           },
           {
             name: "Failed",
-            value: passFailData.failed,
+            value: Number(passFailData?.failed || 0),
           },
         ]);
 

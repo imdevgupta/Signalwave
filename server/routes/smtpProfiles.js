@@ -1,6 +1,8 @@
 import express from "express";
 
 import SmtpProfile from "../models/SmtpProfile.js";
+import SystemSetting from "../models/SystemSetting.js";
+import Alert from "../models/Alert.js";
 import { requireAuth } from "../middleware/auth.js";
 import { encrypt } from "../services/cryptoService.js";
 import SmtpTestHistory from "../models/SmtpTestHistory.js";
@@ -38,21 +40,40 @@ router.get("/", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/", requireAuth, async (req, res) => {
-  const profile = await SmtpProfile.create({
-    name: req.body.name,
-    host: req.body.host,
-    port: req.body.port,
-    secure: req.body.secure,
-    username: req.body.username,
-    encryptedPassword: encrypt(req.body.password),
-    fromAddress: req.body.fromAddress,
-    monitoringEnabled: true,
-    monitoringFrequency: "15m",
-    createdBy: req.user._id,
-  });
+/*
+|--------------------------------------------------------------------------
+| Create SMTP Profile
+|--------------------------------------------------------------------------
+*/
 
-  res.json(profile);
+router.post("/", requireAuth, async (req, res) => {
+  try {
+    /*
+|--------------------------------------------------------------------------
+| Load Global Settings
+|--------------------------------------------------------------------------
+*/
+
+    const settings = await SystemSetting.findOne();
+
+    const profile = await SmtpProfile.create({
+      name: req.body.name,
+      host: req.body.host,
+      port: req.body.port,
+      secure: req.body.secure,
+      username: req.body.username,
+      encryptedPassword: encrypt(req.body.password),
+      fromAddress: req.body.fromAddress,
+      monitoringEnabled: true,
+      monitoringFrequency: settings?.defaultFrequency || "15m",
+      createdBy: req.user._id,
+    });
+    res.json(profile);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+    });
+  }
 });
 
 /*
@@ -159,12 +180,26 @@ router.delete("/:id", requireAuth, async (req, res) => {
     }
 
     /*
-    |--------------------------------------------------------------------------
-    | Delete Related Test History
-    |--------------------------------------------------------------------------
-    */
+|--------------------------------------------------------------------------
+| Delete Related Test History
+|--------------------------------------------------------------------------
+*/
 
     await SmtpTestHistory.deleteMany({
+      profileId: profile._id,
+    });
+
+    /*
+|--------------------------------------------------------------------------
+| Delete Related Alerts
+|--------------------------------------------------------------------------
+|
+| Prevent orphan alerts after a profile
+| has been removed.
+|
+*/
+
+    await Alert.deleteMany({
       profileId: profile._id,
     });
 

@@ -48,7 +48,7 @@ router.post("/run/:profileId", requireAuth, async (req, res) => {
       const authResult = await testAuthentication({
         host: profile.host,
         port: profile.port,
-        secure: profile.secure,
+        securityMode: profile.securityMode,
         username: profile.username,
         password,
       });
@@ -68,6 +68,11 @@ router.post("/run/:profileId", requireAuth, async (req, res) => {
       profileName: profile.name,
       host: profile.host,
       port: profile.port,
+      securityMode: profile.secure
+        ? "SSL/TLS"
+        : profile.port === 587
+          ? "STARTTLS"
+          : "Plain SMTP",
       status: hasFail ? "fail" : "pass",
       testType: "diagnostics",
       results: diagnostics,

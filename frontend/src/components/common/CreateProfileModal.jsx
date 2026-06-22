@@ -8,6 +8,7 @@ export default function CreateProfileModal({ open, onClose, onCreated }) {
     host: "",
     port: 587,
     secure: false,
+    securityMode: "auto",
     username: "",
     password: "",
     fromAddress: "",
@@ -72,9 +73,29 @@ export default function CreateProfileModal({ open, onClose, onCreated }) {
             placeholder="Port"
             className="w-full border p-3 rounded"
             value={form.port}
-            onChange={(e) => updateField("port", Number(e.target.value))}
+            onChange={(e) => {
+              const port = Number(e.target.value);
+
+              updateField("port", port);
+
+              if (port === 465) {
+                updateField("securityMode", "ssl");
+              }
+
+              if (port === 587) {
+                updateField("securityMode", "starttls");
+              }
+
+              if (port === 25) {
+                updateField("securityMode", "none");
+              }
+            }}
             required
           />
+
+          <p className="text-sm text-slate-500">
+            465 = SSL/TLS • 587 = STARTTLS • 25 = Plain SMTP
+          </p>
 
           <input
             placeholder="Username"
@@ -101,14 +122,25 @@ export default function CreateProfileModal({ open, onClose, onCreated }) {
             required
           />
 
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={form.secure}
-              onChange={(e) => updateField("secure", e.target.checked)}
-            />
-            Secure SMTP
-          </label>
+          <div>
+            <label className="block mb-2 font-medium">
+              Connection Security
+            </label>
+
+            <select
+              value={form.securityMode}
+              onChange={(e) => updateField("securityMode", e.target.value)}
+              className="w-full border p-3 rounded"
+            >
+              <option value="auto">Auto Detect (Recommended)</option>
+
+              <option value="ssl">SSL/TLS</option>
+
+              <option value="starttls">STARTTLS</option>
+
+              <option value="none">None</option>
+            </select>
+          </div>
 
           {error && <div className="text-red-500">{error}</div>}
 

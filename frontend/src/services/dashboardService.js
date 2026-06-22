@@ -1,21 +1,73 @@
 import { api } from "./api";
 
+import { ensureArray, ensureObject } from "./responseValidator";
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard Statistics
+|--------------------------------------------------------------------------
+*/
+
 export async function getDashboardStats() {
   const response = await api.get("/dashboard/stats");
-  return response.data;
+
+  return ensureObject(response.data);
 }
+
+/*
+|--------------------------------------------------------------------------
+| Pass / Fail Chart
+|--------------------------------------------------------------------------
+|
+| Backend returns:
+| {
+|   passed: Number,
+|   failed: Number
+| }
+|
+*/
 
 export async function getPassFailData() {
   const response = await api.get("/dashboard/pass-fail");
-  return response.data;
+
+  return ensureObject(response.data);
 }
+
+/*
+|--------------------------------------------------------------------------
+| Activity Chart
+|--------------------------------------------------------------------------
+|
+| Backend returns:
+| [
+|   {
+|     date,
+|     tests
+|   }
+| ]
+|
+*/
 
 export async function getActivityData() {
   const response = await api.get("/dashboard/activity");
-  return response.data;
+
+  return ensureArray(response.data);
 }
+
+/*
+|--------------------------------------------------------------------------
+| Recent Failures
+|--------------------------------------------------------------------------
+|
+| Backend returns:
+| [
+|   historyRecord
+| ]
+|
+*/
 
 export async function getRecentFailures() {
   const response = await api.get("/dashboard/recent-failures");
-  return response.data;
+
+  return ensureArray(response.data);
 }

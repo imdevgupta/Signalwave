@@ -1,5 +1,6 @@
 import express from "express";
 import Alert from "../models/Alert.js";
+import SmtpProfile from "../models/SmtpProfile.js";
 import { requireAuth } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -8,11 +9,48 @@ const router = express.Router();
 |--------------------------------------------------------------------------
 | Get Alerts
 |--------------------------------------------------------------------------
+|
+| Admin:
+|   Can view all alerts.
+|
+| Member:
+|   Can view alerts only for profiles they own.
+|
 */
 
 router.get("/", requireAuth, async (req, res) => {
   try {
-    const alerts = await Alert.find().sort({
+    /*
+    --------------------------------------------------------------------------
+    | Admin
+    --------------------------------------------------------------------------
+    */
+
+    if (req.user.role === "admin") {
+      const alerts = await Alert.find().sort({
+        createdAt: -1,
+      });
+
+      return res.json(alerts);
+    }
+
+    /*
+    --------------------------------------------------------------------------
+    | Member / Viewer
+    --------------------------------------------------------------------------
+    */
+
+    const profiles = await SmtpProfile.find({
+      createdBy: req.user._id,
+    }).select("_id");
+
+    const profileIds = profiles.map((p) => p._id);
+
+    const alerts = await Alert.find({
+      profileId: {
+        $in: profileIds,
+      },
+    }).sort({
       createdAt: -1,
     });
 
@@ -23,7 +61,6 @@ router.get("/", requireAuth, async (req, res) => {
     });
   }
 });
-
 /*
 |--------------------------------------------------------------------------
 | Acknowledge Alert

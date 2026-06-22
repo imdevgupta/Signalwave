@@ -32,11 +32,11 @@ export default function ProfileDetailsPage() {
     host: "",
     port: "",
     secure: false,
+    securityMode: "auto",
     username: "",
     password: "",
     fromAddress: "",
   });
-
   /*
   |--------------------------------------------------------------------------
   | Monitoring State
@@ -86,6 +86,7 @@ export default function ProfileDetailsPage() {
           host: data.host,
           port: data.port,
           secure: data.secure,
+          securityMode: data.securityMode || "auto",
           username: data.username,
           password: "",
           fromAddress: data.fromAddress,
@@ -231,6 +232,7 @@ export default function ProfileDetailsPage() {
                     host: profile.host,
                     port: profile.port,
                     secure: profile.secure,
+                    securityMode: profile.securityMode || "auto",
                     username: profile.username,
                     password: "",
                     fromAddress: profile.fromAddress,
@@ -277,9 +279,9 @@ export default function ProfileDetailsPage() {
             </div>
 
             <div>
-              <strong>Secure:</strong>
+              <strong>Security Mode:</strong>
               <br />
-              {profile.secure ? "Yes" : "No"}
+              {profile.securityMode || "auto"}
             </div>
           </div>
         ) : (
@@ -320,12 +322,29 @@ export default function ProfileDetailsPage() {
               <input
                 type="number"
                 value={form.port}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const port = Number(e.target.value);
+
+                  let securityMode = form.securityMode;
+
+                  if (port === 465) {
+                    securityMode = "ssl";
+                  }
+
+                  if (port === 587) {
+                    securityMode = "starttls";
+                  }
+
+                  if (port === 25) {
+                    securityMode = "none";
+                  }
+
                   setForm({
                     ...form,
-                    port: Number(e.target.value),
-                  })
-                }
+                    port,
+                    securityMode,
+                  });
+                }}
                 className="w-full border rounded px-3 py-2"
               />
             </div>
@@ -378,19 +397,30 @@ export default function ProfileDetailsPage() {
             </div>
 
             <div className="col-span-2">
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.secure}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      secure: e.target.checked,
-                    })
-                  }
-                />
-                Use Secure Connection (SSL/TLS)
-              </label>
+              <label className="block text-sm mb-1">Connection Security</label>
+
+              <select
+                value={form.securityMode}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    securityMode: e.target.value,
+                  })
+                }
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="auto">Auto Detect (Recommended)</option>
+
+                <option value="ssl">SSL/TLS</option>
+
+                <option value="starttls">STARTTLS</option>
+
+                <option value="none">None</option>
+              </select>
+
+              <p className="text-xs text-slate-500 mt-1">
+                465 = SSL/TLS • 587 = STARTTLS • 25 = Plain SMTP
+              </p>
             </div>
           </div>
         )}

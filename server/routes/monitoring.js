@@ -23,7 +23,10 @@ router.get("/dashboard", requireAuth, async (req, res) => {
             createdBy: req.user._id,
           };
 
-    const profiles = await SmtpProfile.find(profileFilter);
+    const profiles = await SmtpProfile.find(profileFilter).populate(
+      "createdBy",
+      "name email",
+    );
 
     const dashboard = [];
 
@@ -49,8 +52,11 @@ router.get("/dashboard", requireAuth, async (req, res) => {
 
         profileName: profile.name,
 
-        owner: req.user.role === "admin" ? profile.createdBy : undefined,
+        ownerName:
+          req.user.role === "admin" ? profile.createdBy?.name : undefined,
 
+        ownerEmail:
+          req.user.role === "admin" ? profile.createdBy?.email : undefined,
         frequency: profile.monitoringFrequency,
 
         enabled: profile.monitoringEnabled,
